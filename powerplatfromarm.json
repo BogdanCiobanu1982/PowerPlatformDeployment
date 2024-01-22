@@ -279,13 +279,7 @@
             }
         }
     },
-    "variables": {
-        "deploymentUris": {            
-            "northStarTemplateUri": "[uri(deployment().properties.templateLink.uri, './powerplatformdeployment.json')]"
-        },     
-        "deploymentNames": {
-            "northStarDeploymentName": "('PPLZ-Setup'), 64)]"
-        },
+    "variables": {                    
         "resourceNamePrefix": "PPLZ",               
         "emptyString": "''"
     },
@@ -294,13 +288,12 @@
             // Deploying the North Star Power Platform script (Power Platform Landing Zones)
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
-            "name": "[variables('deploymentNames').northStarDeploymentName]",
-            "location": "[deployment().location]",
+            "name": "PPLZ-Setup-uksouth-ppNorthStar",            
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
                     "contentVersion": "1.0.0.0",
-                    "uri": "[variables('deploymentUris').northStarTemplateUri]"
+                    "uri": "https://raw.githubusercontent.com/BogdanCiobanu1982/PowerPlatformDeployment/main/powerplatformdeployment.json"
                 },
                 "parameters": {
                     "ppIdentity": {
