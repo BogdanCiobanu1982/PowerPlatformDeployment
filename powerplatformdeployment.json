@@ -240,7 +240,7 @@
         },
         "scriptUri": {
             "type": "string",
-            "defaultValue": "C:\\Users\\BogdanCiobanu\\powerplatformdeployment.ps1",
+            "defaultValue": "https://raw.githubusercontent.com/BogdanCiobanu1982/PowerPlatformDeployment/main/powerplatformdeployment.json",
             "metadata": {
                 "description": "The uri pointing to the PowerShell script used in the deploymentScript"
             }
