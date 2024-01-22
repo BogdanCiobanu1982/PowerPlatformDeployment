@@ -1,0 +1,392 @@
+/*
+    Power Platform Landing Zones ARM template.
+    This template will in concert with the portal extension provision and bootstrap 1) Azure infrastructure as prerequisite for monitoring, logging, and security,
+    and the initial Admin environments for Power Platform, to construct and operationalize landing zones for citizen - and professional developers.
+*/
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+     "parameters": {
+        "ppIdentity": {
+            "type": "string",
+            "metadata": {
+                "description": "Provide the resourceId of the User Managed Identity."
+            }
+        },
+        "ppTenantDlp": {
+            "type": "string",
+            "defaultValue": "none",
+            "allowedValues": [
+                "high",
+                "medium",
+                "low",
+                "none"
+            ],
+            "metadata": {
+                "description": "Select if recommended DLP policies should be assigned at the tenant."
+            }
+        },
+        "ppGuestMakerSetting": {
+            "type": "string",
+            "allowedValues": [
+                "yes",
+                "no"
+            ],
+            "defaultValue": "no",
+            "metadata": {
+                "description": "Select to enable/disable this setting."
+            }
+        },
+        "ppAppSharingSetting": {
+            "type": "string",
+            "allowedValues": [
+                "yes",
+                "no"
+            ],
+            "defaultValue": "no",
+            "metadata": {
+                "description": "Select to enable/disable this setting."
+            }
+        },
+        "ppEnvCreationSetting": {
+            "type": "string",
+            "allowedValues": [
+                "yes",
+                "no"
+            ],
+            "defaultValue": "no",
+            "metadata": {
+                "description": "Select to enable/disable this setting."
+            }
+        },
+        "ppTrialEnvCreationSetting": {
+            "type": "string",
+            "allowedValues": [
+                "yes",
+                "no"
+            ],
+            "defaultValue": "no",
+            "metadata": {
+                "description": "Select to enable/disable this setting."
+            }
+        },
+        "ppEnvCapacitySetting": {
+            "type": "string",
+            "allowedValues": [
+                "yes",
+                "no"
+            ],
+            "defaultValue": "no",
+            "metadata": {
+                "description": "Select to enable/disable this setting."
+            }
+        },
+        "ppTenantIsolationSetting": {
+            "type": "string",
+            "defaultValue": "none",
+            "allowedValues": [
+                "inbound",
+                "outbound",
+                "both",
+                "none"
+            ],
+            "metadata": {
+                "description": "Select tenant isolation setting"
+            }
+        },
+        "ppTenantIsolationDomains": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Provide the tenant names, IDs, or use * for all tenants"
+            }
+        },        
+        "ppDefaultRenameText": {
+            "type": "string",
+            "defaultValue": "''",
+            "metadata": {
+                "description": "Provide new display name for the _default_ Power Platform Environment in the tenant."
+            }
+        },
+        "ppDefaultDlp": {
+            "type": "string",
+            "allowedValues": [
+                "yes",
+                "no"
+            ],
+            "defaultValue": "no",
+            "metadata": {
+                "description": "Select to enable/disable this setting."
+            }
+        },
+        "ppDefaultManagedEnv": {
+            "type": "string",
+            "defaultValue": "no",
+            "allowedValues": [
+                "no",
+                "yes"
+            ],
+            "metadata": {
+                "description": "Select to enable/disable this setting."
+            }
+        },
+        "ppDefaultManagedSharing": {
+            "type": "string",
+            "defaultValue": "no",
+            "allowedValues": [
+                "no",
+                "yes"
+            ],
+            "metadata": {
+                "description": "Select to enable/disable this setting."
+            }
+        },
+        "ppCitizen": {
+            "type": "string",
+            "allowedValues": [
+                "yes",
+                "half",
+                "no",
+                "custom"
+            ],
+            "defaultValue": "no",
+            "metadata": {
+                "description": "Select environment type. Yes will enable with Dataverse, Half will create without Dataverse."
+            }
+        },
+        "ppCitizenCount": {
+            "type": "int",
+            "maxValue": 200,
+            "defaultValue": 1,
+            "metadata": {
+                "description": "Select how many environments for citizen dev to be created."
+            }
+        },
+        "ppCitizenNaming": {
+            "type": "string",
+            "defaultValue": "''",
+            "metadata": {
+                "description": "Provide naming convention for the citizen dev environments."
+            }
+        },
+        "ppCitizenRegion": {
+            "type": "string",
+            "allowedValues": [
+                "europe",
+                "unitedstates",
+                "asia",
+                "japan",
+                "india",
+                "canada",
+                "southamerica",
+                "unitedkingdom",
+                "france",
+                "germany",
+                "unitedarabemirates",
+                "australia",
+                "norway"
+            ],
+            "defaultValue": "unitedstates",
+            "metadata": {
+                "description": "Provide location for the Admin environments."
+            }
+        },
+        "ppCitizenDlp": {
+            "type": "string",
+            "allowedValues": [
+                "yes",
+                "no"
+            ],
+            "defaultValue": "no",
+            "metadata": {
+                "description": "Select to enable/disable recommended DLP policies for citizen dev environments."
+            }
+        },
+        "ppCitizenManagedEnv": {
+            "type": "string",
+            "defaultValue": "no",
+            "allowedValues": [
+                "no",
+                "yes"
+            ],
+            "metadata": {
+                "description": "Select to enable/disable this setting."
+            }
+        },
+        "ppCitizenBilling": {
+            "type": "string",
+            "defaultValue": "''",
+            "metadata": {
+                "description": "AZURE-only, to provide subscriptionId for the subscription billing."
+            }
+        },
+        "ppCitizenAlm": {
+            "type": "string",
+            "allowedValues": [
+                "yes",
+                "no"
+            ],
+            "defaultValue": "no",
+            "metadata": {
+                "description": "Select if dedicated environments for Development, Test, and Production should be created for each landing zone"
+            }
+        },       
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Provide the Azure location for the deployments"
+            }
+        },
+        "rgName": {
+            "type": "string",
+            "metadata": {
+                "description": "Resource Group where the deploymentScript will be provisioned"
+            }
+        },
+        "scriptUri": {
+            "type": "string",
+            "defaultValue": "C:\\Users\\BogdanCiobanu\\powerplatformdeployment.ps1",
+            "metadata": {
+                "description": "The uri pointing to the PowerShell script used in the deploymentScript"
+            }
+        },
+        "ppCitizenConfiguration": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Provide strings for custom citizen Environment creation."
+            }
+        },
+        "ppCitizenLanguage": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Select language for the environments."
+            }
+        },
+        "ppCitizenCurrency": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Select the currency for the environments."
+            }
+        },
+        "ppCitizenDescription": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Provide description for the environments."
+            }
+        }
+    },
+    "variables": {
+        "deploymentUris": {            
+            "northStarTemplateUri": "[uri(deployment().properties.templateLink.uri, './powerplatformdeployment.json')]"
+        },     
+        "deploymentNames": {
+            "northStarDeploymentName": "('PPLZ-Setup'), 64)]"
+        },
+        "resourceNamePrefix": "PPLZ",               
+        "emptyString": "''"
+    },
+    "resources": [
+        {
+            // Deploying the North Star Power Platform script (Power Platform Landing Zones)
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "name": "[variables('deploymentNames').northStarDeploymentName]",
+            "location": "[deployment().location]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "contentVersion": "1.0.0.0",
+                    "uri": "[variables('deploymentUris').northStarTemplateUri]"
+                },
+                "parameters": {
+                    "ppIdentity": {
+                        "value": "[parameters('ppIdentity')]"
+                    },
+                    "ppTenantDlp": {
+                        "value": "[parameters('ppTenantDlp')]"
+                    },
+                    "ppGuestMakerSetting": {
+                        "value": "[parameters('ppGuestMakerSetting')]"
+                    },
+                    "ppAppSharingSetting": {
+                        "value": "[parameters('ppAppSharingSetting')]"
+                    },
+                    "ppEnvCreationSetting": {
+                        "value": "[parameters('ppEnvCreationSetting')]"
+                    },
+                    "ppTrialEnvCreationSetting": {
+                        "value": "[parameters('ppTrialEnvCreationSetting')]"
+                    },
+                    "ppTenantIsolationSetting": {
+                        "value": "[parameters('ppTenantIsolationSetting')]"
+                    },
+                    "ppTenantIsolationDomains": {
+                        "value": "[if(empty(parameters('ppTenantIsolationDomains')), variables('emptyString'), parameters('ppTenantIsolationDomains'))]"
+                    },
+                    "ppCitizenAlm": {
+                        "value": "[parameters('ppCitizenAlm')]"
+                    },                                     
+                    "ppEnvCapacitySetting": {
+                        "value": "[parameters('ppEnvCapacitySetting')]"
+                    },                    
+                    "ppDefaultRenameText": {
+                        "value": "[if(empty(parameters('ppDefaultRenameText')), variables('emptyString'), parameters('ppDefaultRenameText'))]"
+                    },
+                    "ppDefaultDlp": {
+                        "value": "[parameters('ppDefaultDlp')]"
+                    },
+                    "ppDefaultManagedEnv": {
+                        "value": "[parameters('ppDefaultManagedEnv')]"
+                    },
+                    "ppDefaultManagedSharing": {
+                        "value": "[parameters('ppDefaultManagedSharing')]"
+                    },
+                    "ppCitizen": {
+                        "value": "[parameters('ppCitizen')]"
+                    },
+                    "ppCitizenCount": {
+                        "value": "[parameters('ppCitizenCount')]"
+                    },
+                    "ppCitizenNaming": {
+                        "value": "[if(empty(parameters('ppCitizenNaming')), variables('emptyString'), parameters('ppCitizenNaming'))]"
+                    },
+                    "ppCitizenRegion": {
+                        "value": "[parameters('ppCitizenRegion')]"
+                    },
+                    "ppCitizenBilling": {
+                        "value": "[if(empty(parameters('ppCitizenBilling')), variables('emptyString'), parameters('ppCitizenBilling'))]"
+                    },
+                    "ppCitizenDlp": {
+                        "value": "[parameters('ppCitizenDlp')]"
+                    },
+                    "ppCitizenManagedEnv": {
+                        "value": "[parameters('ppCitizenManagedEnv')]"
+                    },                    
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "rgName": {
+                        "value": "[concat(variables('resourceNamePrefix'), '-setup-', parameters('location'))]"
+                    },
+                    "ppCitizenConfiguration": {
+                        "value": "[if(empty(parameters('ppCitizenConfiguration')), variables('emptyString'), parameters('ppCitizenConfiguration'))]"
+                    },                    
+                    "ppCitizenDescription": {
+                        "value": "[if(empty(parameters('ppCitizenDescription')), variables('emptyString'), parameters('ppCitizenDescription'))]"
+                    },
+                    "ppCitizenLanguage": {
+                        "value": "[if(empty(parameters('ppCitizenLanguage')), variables('emptyString'), parameters('ppCitizenLanguage'))]"
+                    },
+                    "ppCitizenCurrency": {
+                        "value": "[if(empty(parameters('ppCitizenCurrency')), variables('emptyString'), parameters('ppCitizenCurrency'))]"
+                    }                    
+                }
+            }
+        }        
+    ],
+    "outputs": {}
+}
