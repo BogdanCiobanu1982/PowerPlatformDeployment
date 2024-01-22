@@ -72,7 +72,7 @@
             "value": "arm-vscode"
         },
         "scriptUri": {
-            "value": "C:\\Users\\BogdanCiobanu\\Desktop\\ARM Template\\powerplatformdeployment.ps1"
+            "value": "https://raw.githubusercontent.com/BogdanCiobanu1982/PowerPlatformDeployment/main/powerplatformdeployment.ps1"
         },
         "ppCitizenConfiguration": {
             "value": "ppEnvName:ANSRNDPP,ppEnvDescription:PPLandingZones,ppRegion:europe,ppLanguage:1033,ppCurrency:gbp,ppRbac:a88fd5e8-a50d-4aa0-9d64-d4bcef4848c8"
